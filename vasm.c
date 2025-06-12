@@ -10,6 +10,11 @@
 #include "stabs.h"
 #include "dwarf.h"
 
+#ifdef __WASM__
+#include <emscripten.h>
+#endif
+
+
 #define _VER "vasm 2.0b"
 const char *copyright = _VER " (c) in 2002-2025 Volker Barthelmann";
 #ifdef AMIGA
@@ -594,7 +599,7 @@ static void fix_labels(void)
       /* imported/exported symbol names receive a leading underscore */
       size_t len = strlen(sym->name) + 1;
       char *p = myrealloc(sym->name,len+1);
- 
+
       memmove(p+1,p,len);
       p[0] = '_';
       sym->name = p;
@@ -1117,7 +1122,7 @@ static void set_defaults(void)
     set_syntax_default();
 }
 
-int main(int argc,char **argv)
+void main_fn(int argc,char **argv)
 {
   static strbuf buf;
   int i;
@@ -1433,5 +1438,27 @@ int main(int argc,char **argv)
     }
   }
   leave();
-  return 0; /* not reached */
 }
+
+int main(int argc,char **argv)
+{
+  return 0;
+}
+
+#ifdef __EMSCRIPTEN__
+#ifdef __cplusplus
+#define EXTERN extern "C"
+#else
+#define EXTERN
+#endif
+
+EXTERN EMSCRIPTEN_KEEPALIVE void runVasm(int argc, char **argv)
+{
+    printf("Running vasm with command:\n");
+    for (int i = 0; i < argc; i++) {
+        printf("%s ", argv[i]);
+    }
+    printf("\n");
+    main_fn(argc, argv);
+}
+#endif

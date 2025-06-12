@@ -19,8 +19,16 @@ VODOBJS = obj$(TARGET)/vobjdump.o
 
 INCLUDES = -I. -Icpus/$(CPU) -Isyntax/$(SYNTAX)
 
+ifeq ($(WASM),1)
+	TARGETEXTENSION = .js
+    CFLAGS += -D__WASM__
+	LDFLAGS += -s "EXPORTED_RUNTIME_METHODS=['ccall', 'stringToUTF8', 'setValue', 'FS']" \
+				-s NO_EXIT_RUNTIME=1 -s "ENVIRONMENT='web'" -s "FORCE_FILESYSTEM=1" \
+				-s "ALLOW_MEMORY_GROWTH=1" -s "EXPORT_NAME='vasm'" -s "MODULARIZE=1" -s EXPORT_ES6=1 \
+				-lidbfs.js -s "EXPORTED_FUNCTIONS=['_malloc', '_free', '_main', '_runVasm']"
+endif
 VASMEXE = vasm$(CPU)_$(SYNTAX)$(TARGET)$(TARGETEXTENSION)
-VOBJDMPEXE = vobjdump$(TARGET)$(TARGETEXTENSION)
+#VOBJDMPEXE = vobjdump$(TARGET)$(TARGETEXTENSION)
 
 
 all: $(VASMEXE) $(VOBJDMPEXE)
@@ -28,11 +36,11 @@ all: $(VASMEXE) $(VOBJDMPEXE)
 $(VASMEXE): $(OBJS)
 	$(LD) $(OBJS) $(LDFLAGS) $(LDOUT)$(VASMEXE)
 
-$(VOBJDMPEXE): $(VODOBJS)
-	$(LD) $(VODOBJS) $(LDFLAGS) $(LDOUT)$(VOBJDMPEXE)
+#$(VOBJDMPEXE): $(VODOBJS)
+	#$(LD) $(VODOBJS) $(LDFLAGS) $(LDOUT)$(VOBJDMPEXE)
 
 clean:
-	$(RM) $(OBJS) $(VASMEXE) $(VODOBJS) $(VOBJDMPEXE)
+	$(RM) $(OBJS) $(VASMEXE) $(VODOBJS) #$(VOBJDMPEXE)
 
 
 $(PRE)vasm.o: vasm.c vasm.h symbol.h osdep.h stabs.h dwarf.h expr.h supp.h atom.h source.h listing.h cpus/$(CPU)/cpu.h syntax/$(SYNTAX)/syntax.h
