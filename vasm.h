@@ -96,7 +96,7 @@ typedef unsigned int bvtype;
 #define LABELS_ARE_LOCAL (1<<3)
 #define ABSOLUTE         (1<<4)
 #define PREVABS          (1<<5) /* saved ABSOLUTE-flag during RORG-block */
-#define IN_RORG          (1<<6)       
+#define IN_RORG          (1<<6)
 #define NEAR_ADDRESSING  (1<<7)
 #define FAR_ADDRESSING   (1<<8)
 #define SECRSRVD       (1L<<24) /* bits 24-31 are reserved for output modules */
@@ -146,8 +146,8 @@ extern source *cur_src;
 extern section *current_section,container_section;
 extern int num_secs,final_pass,exec_out,nostdout;
 extern struct stabdef *first_nlist,*last_nlist;
-extern char emptystr[];
-extern char vasmsym_name[];
+extern const char emptystr[];
+extern const char vasmsym_name[];
 
 extern int octetsperbyte,output_bitsperbyte,output_bytes_le,input_bytes_le;
 extern unsigned long long taddrmask;

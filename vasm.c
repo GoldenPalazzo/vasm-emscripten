@@ -62,8 +62,8 @@ taddr taddrmin,taddrmax;
 /* for output modules supporting stabs */
 struct stabdef *first_nlist,*last_nlist;
 
-char emptystr[]="";
-char vasmsym_name[]="__VASM";
+const char emptystr[]="";
+const char vasmsym_name[]="__VASM";
 
 static FILE *outfile;
 static int maxpasses=MAXPASSES;
@@ -116,8 +116,8 @@ void leave(void)
 
   if(errors||(fail_on_warning&&warnings))
     exit(EXIT_FAILURE);
-  else
-    exit(EXIT_SUCCESS);
+  /*else*/
+    /*exit(EXIT_SUCCESS);*/
 }
 
 /* Convert all labels from an offset-section into absolute expressions. */
@@ -1122,8 +1122,75 @@ static void set_defaults(void)
     set_syntax_default();
 }
 
+
+void init_global_vars()
+{
+    output_format = "test";
+    /*emptystr = "";*/
+    /*vasmsym_name = "__VASM";*/
+    maxpasses = MAXPASSES;
+    verbose = 1;
+    auto_import = 1;
+    inname = NULL;
+    outname = NULL;
+    chklabels = 0;
+    nocase = 0;
+    no_symbols = 0;
+    pic_check = 0;
+    unnamed_sections = 0;
+    space_init = 0;
+    inst_alignment = 0;
+    asciiout = 0;
+    secname_attr = 0;
+    warn_unalloc_ini_dat = 0;
+    mnemohash = NULL;
+    filename = NULL;
+    debug_filename = NULL;
+    cur_src = NULL;
+    current_section = NULL;
+    container_section = (section){NULL,NULL,0,0,0,0,0,0,0,0,0,0,0,0};
+    num_secs = 0;
+    debug = 0;
+    final_pass = 0;
+    exec_out = 0;
+    nostdout = 0;
+    defsectname = NULL;
+    defsecttype = NULL;
+    defsectorg = 0;
+    octetsperbyte = 0;
+    output_bitsperbyte = 0;
+    output_bytes_le = 0;
+    input_bytes_le = 0;
+    taddrmin = 0;
+    taddrmask = 0;
+    first_nlist = NULL;
+    last_nlist = NULL;
+    outfile = NULL;
+    first_section = NULL;
+    last_section = NULL;
+#if NOT_NEEDED
+    prev_sec = NULL;
+    prev_org = NULL;
+#endif
+    memset(secstack,0,sizeof(secstack));
+    secstack_index = 0;
+    listname = NULL;
+    dep_filename = NULL;
+    add_uscore = 0;
+    dwarf = 0;
+    fail_on_warning = 0;
+    verbose = 1;
+    auto_import = 1;
+    sec_padding = 0;
+    output_copyright = NULL;
+    write_object = NULL;
+    output_args = NULL;
+}
+
+
 void main_fn(int argc,char **argv)
 {
+  init_global_vars();
   static strbuf buf;
   int i;
   for(i=1;i<argc;i++){
@@ -1442,6 +1509,24 @@ void main_fn(int argc,char **argv)
 
 int main(int argc,char **argv)
 {
+#ifndef __EMSCRIPTEN__
+  char **argv_copy;
+  argv_copy = malloc(argc * sizeof(char *));
+  int i,j;
+  for (j = 0; j < 100; j++) {
+    for (i = 0; i < argc; i++) {
+      argv_copy[i] = malloc(strlen(argv[i]) + 1);
+      strcpy(argv_copy[i], argv[i]);
+    }
+    main_fn(argc,argv_copy);
+    for (i = 0; i < argc; i++) {
+      free(argv_copy[i]);
+    }
+  }
+  free(argv_copy);
+#else
+  printf("TODO: This vasm cross compilation for Emscripten has lots of memory leaks that are being investigated.\n");
+#endif
   return 0;
 }
 
