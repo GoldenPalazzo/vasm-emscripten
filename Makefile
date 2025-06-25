@@ -9,7 +9,12 @@ TARGET =
 TARGETEXTENSION =
 
 CCOUT = -o $(DUMMY)
-CFLAGS = -c -std=gnu90 -O2 -pedantic -Wno-long-long -Wno-shift-count-overflow -DUNIX $(OUTFMTS)
+CFLAGS = -c -std=gnu90 -pedantic -Wno-long-long -Wno-shift-count-overflow -DUNIX $(OUTFMTS)
+ifeq ($(DEBUG),1)
+	CFLAGS += -g
+else
+	CFLAGS += -DNDEBUG -O2
+endif
 
 LD = $(CC)
 LDOUT = $(CCOUT)
