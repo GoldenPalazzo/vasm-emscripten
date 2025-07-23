@@ -21,14 +21,19 @@ INCLUDES = -I. -Icpus/$(CPU) -Isyntax/$(SYNTAX)
 
 ifeq ($(WASM),1)
 	TARGETEXTENSION = .js
+endif
+
+VASMEXE = vasm$(CPU)_$(SYNTAX)$(TARGET)$(TARGETEXTENSION)
+#VOBJDMPEXE = vobjdump$(TARGET)$(TARGETEXTENSION)
+ifeq ($(WASM),1)
     CFLAGS += -D__WASM__
 	LDFLAGS += -s "EXPORTED_RUNTIME_METHODS=['ccall', 'stringToUTF8', 'setValue', 'FS']" \
 				-s NO_EXIT_RUNTIME=1 -s "ENVIRONMENT='web'" -s "FORCE_FILESYSTEM=1" \
 				-s "ALLOW_MEMORY_GROWTH=1" -s "EXPORT_NAME='vasm'" -s "MODULARIZE=1" -s EXPORT_ES6=1 \
-				-lidbfs.js -s "EXPORTED_FUNCTIONS=['_malloc', '_free', '_main', '_runVasm']"
+				-lidbfs.js -s "EXPORTED_FUNCTIONS=['_malloc', '_free', '_main', '_runVasm', '_checkVasmRead']" \
+                -lembind --emit-tsd vasm$(CPU)_$(SYNTAX)$(TARGET).d.ts
+
 endif
-VASMEXE = vasm$(CPU)_$(SYNTAX)$(TARGET)$(TARGETEXTENSION)
-#VOBJDMPEXE = vobjdump$(TARGET)$(TARGETEXTENSION)
 
 
 all: $(VASMEXE) $(VOBJDMPEXE)
