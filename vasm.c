@@ -1125,6 +1125,7 @@ static void set_defaults(void)
 
 void init_global_vars()
 {
+    errors = 0; // error.c
     output_format = "test";
     /*emptystr = "";*/
     /*vasmsym_name = "__VASM";*/
